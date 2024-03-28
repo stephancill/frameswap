@@ -1,6 +1,10 @@
-import { Chain, createPublicClient, http } from "viem";
-import { TESTNET_ENABLED, publicClient, reservoirClient } from "./client";
-import { CallBody, Execute } from "@reservoir0x/relay-sdk";
+import {
+  CallBody,
+  Execute,
+  MAINNET_RELAY_API,
+  TESTNET_RELAY_API,
+} from "@reservoir0x/relay-sdk";
+import { Chain, createPublicClient, formatEther, http } from "viem";
 import {
   arbitrum,
   arbitrumNova,
@@ -12,66 +16,12 @@ import {
   zkSync,
   zora,
 } from "viem/chains";
-import { getPrice } from "@ensdomains/ensjs/public";
-import { makeRenewTxData } from "./ens/makeRenewTxData";
-import { serializeJsx } from "./renderImage";
-import { Scaffold } from "./components/scaffold";
+import { TESTNET_ENABLED } from "./env";
 
 export function numberWithCommas(x: string | number) {
   var parts = x.toString().split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
   return parts.join(".");
-}
-
-export function formatExpiration(expiryDate: Date): string {
-  const now = new Date();
-  let output = "";
-  const yearsDiff = expiryDate.getFullYear() - now.getFullYear();
-  const monthsDiff = expiryDate.getMonth() - now.getMonth();
-  const daysDiff = expiryDate.getDate() - now.getDate();
-
-  let adjustedYears = yearsDiff;
-  let adjustedMonths = monthsDiff;
-  let adjustedDays = daysDiff;
-
-  if (daysDiff < 0) {
-    // Handle the case where days are negative
-    adjustedMonths -= 1;
-    // Find the last day of the previous month
-    const lastDayOfPrevMonth = new Date(
-      expiryDate.getFullYear(),
-      expiryDate.getMonth(),
-      0
-    ).getDate();
-    adjustedDays = lastDayOfPrevMonth + daysDiff;
-  }
-
-  if (monthsDiff < 0) {
-    // Handle the case where months are negative
-    adjustedYears -= 1;
-    adjustedMonths = 12 + monthsDiff;
-  }
-
-  // Constructing the output string
-  if (adjustedYears > 0) {
-    output += adjustedYears + "y";
-    if (adjustedMonths > 0) {
-      output += " " + adjustedMonths + "mo";
-    }
-  } else if (adjustedMonths > 0) {
-    output += adjustedMonths + "mo";
-    if (adjustedDays > 0) {
-      // Optionally add days to the month output
-      // output += ' and ' + adjustedDays + (adjustedDays === 1 ? ' day' : ' days');
-    }
-  } else if (adjustedDays > 0) {
-    output += adjustedDays + "d";
-  } else {
-    // In case the expiration is today or somehow past
-    output = "expires today or is already expired";
-  }
-
-  return output;
 }
 
 export async function getEthUsdPrice(ether?: number | bigint): Promise<number> {
@@ -136,7 +86,9 @@ export async function getBalancesOnChains({
 }
 
 export async function createRelayCall(data: CallBody) {
-  console.log(`fetch ${`${reservoirClient.baseApiUrl}/execute/call`}`, {
+  const relayApiUrl = TESTNET_ENABLED ? TESTNET_RELAY_API : MAINNET_RELAY_API;
+
+  console.log(`fetch ${`${relayApiUrl}/execute/call`}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -144,16 +96,13 @@ export async function createRelayCall(data: CallBody) {
     body: JSON.stringify(data),
   });
 
-  const relayResponse = await fetch(
-    `${reservoirClient.baseApiUrl}/execute/call`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-  );
+  const relayResponse = await fetch(`${relayApiUrl}/execute/call`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  });
 
   if (relayResponse.status !== 200) {
     const data = await relayResponse.json();
@@ -167,23 +116,27 @@ export async function createRelayCall(data: CallBody) {
   return call;
 }
 
-export async function calculateEnsRenewalAuto({
-  renewalYears,
-  name,
+export function formatUsdDisplay(usd: number | string) {
+  const usdNumber = typeof usd === "string" ? parseFloat(usd) : usd;
+
+  return numberWithCommas(
+    // People don't care about cents when it's over $100
+    usdNumber > 100 ? usdNumber.toPrecision(3) : usdNumber.toFixed(2)
+  );
+}
+
+export function formatEtherDisplay(eth: bigint) {
+  return parseFloat(formatEther(eth)).toPrecision(4);
+}
+
+export async function calculateSwapAuto({
   connectedAddress,
 }: {
-  renewalYears: number;
-  name: string;
-  connectedAddress: string;
+  connectedAddress: `0x${string}`;
 }) {
-  const duration = 31536000 * renewalYears;
-  const [{ base: basePrice, premium }, chainBalances] = await Promise.all([
-    getPrice(publicClient, {
-      nameOrNames: name,
-      duration,
-    }),
+  const [chainBalances] = await Promise.all([
     getBalancesOnChains({
-      address: connectedAddress as `0x${string}`,
+      address: connectedAddress,
       // https://docs.relay.link/resources/supported-chains#supported-chains
       chains: TESTNET_ENABLED
         ? [baseSepolia]
@@ -191,12 +144,7 @@ export async function calculateEnsRenewalAuto({
     }),
   ]);
 
-  const value = ((basePrice + premium) * BigInt(110)) / BigInt(100); // add 10% to the price for buffer
-  const tx = makeRenewTxData(publicClient, {
-    nameOrNames: name,
-    duration,
-    value,
-  });
+  const tx = {};
 
   const autoChainId = chainBalances[0]?.chain.id;
 
@@ -208,15 +156,6 @@ export async function calculateEnsRenewalAuto({
     tx,
     fundsChainId: autoChainId,
   };
-}
-
-export function imageUrl(image: JSX.Element) {
-  const imageJson = JSON.stringify(serializeJsx(<Scaffold>{image}</Scaffold>));
-  const imageUrl = `${new URL(
-    "/images",
-    vercelURL() || process.env.APP_URL
-  ).toString()}?${new URLSearchParams({ jsx: imageJson }).toString()}`;
-  return imageUrl;
 }
 
 export function vercelURL() {

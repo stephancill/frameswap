@@ -1,5 +1,6 @@
 import { ImageResponse } from "@vercel/og";
 import React, { ReactNode } from "react";
+import { Scaffold } from "./components/scaffold";
 
 type SerializedNode =
   | {
@@ -72,7 +73,6 @@ export function serializeJsx(children: ReactNode): SerializedNode[] {
               ...serialized.props,
               style: {
                 ...serialized.props.style,
-                display: "flex",
               },
               children: serializeJsx(evaluatedChild),
             },
@@ -100,4 +100,13 @@ export async function renderImage(element: JSX.Element) {
   const buffer = await response.arrayBuffer();
 
   return `data:image/png;base64,${Buffer.from(buffer).toString("base64")}`;
+}
+
+export function imageUrl(image: JSX.Element) {
+  const imageJson = JSON.stringify(serializeJsx(<Scaffold>{image}</Scaffold>));
+  const imageUrl = `${new URL(
+    "/images",
+    process.env.APP_URL
+  ).toString()}?${new URLSearchParams({ jsx: imageJson }).toString()}`;
+  return imageUrl;
 }
