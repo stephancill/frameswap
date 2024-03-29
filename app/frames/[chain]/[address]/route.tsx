@@ -2,6 +2,8 @@ import { Button } from "frames.js/next";
 import { NextRequest } from "next/server";
 import { TokenDetail } from "../../../components/token-detail";
 import { frames, tokenMiddleware } from "../../frames";
+import { APP_URL } from "../../../env";
+import { Logo } from "../../../components/logo";
 
 const frameHandler = async (
   req: NextRequest,
@@ -30,7 +32,12 @@ const frameHandler = async (
       return {
         image: (
           <div tw="flex flex-col">
-            <TokenDetail tokenInfo={ctx.token} />
+            <div tw="mb-10">
+              <Logo />
+            </div>
+            <div tw="mx-auto">
+              <TokenDetail tokenInfo={ctx.token} />
+            </div>
           </div>
         ),
         // Type safety issue

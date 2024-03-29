@@ -1,4 +1,5 @@
 import { getTokenInfo } from "../token";
+import { Pill } from "./pill";
 
 export function TokenDetail({
   tokenInfo,
@@ -6,16 +7,18 @@ export function TokenDetail({
   tokenInfo: NonNullable<Awaited<ReturnType<typeof getTokenInfo>>>;
 }) {
   return (
-    <div tw="flex flex-row items-center">
-      {tokenInfo.image && (
-        <div tw="mr-4">
-          <img src={tokenInfo.image} width={80} height={80} />
+    <Pill>
+      <div tw="p-5">
+        {tokenInfo.image && (
+          <div tw="mr-4">
+            <img src={tokenInfo.image} width={80} height={80} />
+          </div>
+        )}
+        <div tw="flex flex-col">
+          <div tw="font-bold text-[36px]">{tokenInfo.name}</div>
+          <div tw="font-bold text-[30px]">{tokenInfo.symbol}</div>
         </div>
-      )}
-      <div tw="flex flex-col">
-        <div>{tokenInfo.name}</div>
-        <div>{tokenInfo.symbol}</div>
       </div>
-    </div>
+    </Pill>
   );
 }

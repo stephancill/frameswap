@@ -65,7 +65,7 @@ export const POST = frames(async (ctx) => {
 
   return {
     image: (
-      <div tw="flex flex-col">
+      <div tw="flex flex-col text-white">
         <div tw="mb-5">Quote found</div>
         <div tw="flex flex-col">
           <div>
