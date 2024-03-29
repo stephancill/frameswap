@@ -31,7 +31,7 @@ export function Scaffold({ children: element }: { children: React.ReactNode }) {
       </div>
       {/* Icon container */}
       <div tw="absolute bottom-[38%] right-8">
-        <img tw="h-10 w-10" src={`${APP_URL}/icon.svg`} alt="" />
+        <img tw="h-10" src={`${APP_URL}/icon.svg`} alt="" />
       </div>
     </div>
   );
