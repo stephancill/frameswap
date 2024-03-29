@@ -1,5 +1,6 @@
 import { fetchMetadata } from "frames.js/next";
 import { Metadata } from "next";
+import { Logo } from "./components/logo";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -13,5 +14,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function Home() {
-  return <div>GM user data example.</div>;
+  return <div>Frameswap</div>;
 }

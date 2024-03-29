@@ -6,6 +6,7 @@ import { getTokenInfo, searchTokens } from "../../token";
 import { formatWarpcastIntentUrl } from "../../utils";
 import { frames } from "../frames";
 import { Heading } from "../../components/heading";
+import { Pill } from "../../components/pill";
 
 export const POST = frames(async (ctx) => {
   if (!ctx.message) {
@@ -45,7 +46,19 @@ export const POST = frames(async (ctx) => {
       }
 
       return {
-        image: <div>Enter chain name or ID for "{ctx.message.inputText}"</div>,
+        image: (
+          <div tw="w-max-2/3">
+            <Heading>
+              <div tw="flex items-center">
+                Enter chain name or ID for{" "}
+                <Pill tw="px-4 py-2 font-regular">
+                  {ctx.message.inputText.slice(0, 6)}...
+                  {ctx.message.inputText.slice(-4)}
+                </Pill>
+              </div>
+            </Heading>
+          </div>
+        ),
         textInput: "Chain name or ID",
         buttons: [
           <Button
@@ -68,7 +81,7 @@ export const POST = frames(async (ctx) => {
 
       if (!tokenInfo) {
         return {
-          image: <div>Could not find token. Try again</div>,
+          image: <Heading>COULD NOT FIND TOKEN. TRY AGAIN</Heading>,
           textInput: "Enter token address",
           buttons: [
             <Button
@@ -92,7 +105,6 @@ export const POST = frames(async (ctx) => {
       return {
         image: (
           <div tw="flex flex-col">
-            <div tw="mb-2">Token Info</div>
             <TokenDetail tokenInfo={tokenInfo} />
           </div>
         ),

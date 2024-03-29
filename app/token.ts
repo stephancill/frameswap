@@ -1,7 +1,6 @@
 import { publicActionReverseMirage } from "reverse-mirage";
-import { getClient } from "./client";
 import { isAddress } from "viem";
-import { TESTNET_ENABLED } from "./env";
+import { getClient } from "./client";
 import { COINGECKO_CHAIN_OVERRIDES } from "./const";
 
 export type TokenInfo = {
@@ -57,9 +56,10 @@ export async function getTokenInfo({
 
       const client = getClient({
         chainIdOrName:
-          chainIdOrName || COINGECKO_CHAIN_OVERRIDES[chainName]
+          chainIdOrName ||
+          (COINGECKO_CHAIN_OVERRIDES[chainName]
             ? COINGECKO_CHAIN_OVERRIDES[chainName]
-            : chainName,
+            : chainName),
       });
 
       return {
