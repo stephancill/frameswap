@@ -4,6 +4,7 @@ import type {
   MethodParameters,
 } from "@uniswap/smart-order-router";
 import type { getSwapTransaction } from "../uniswap";
+import { TokenInfo } from "../token";
 
 export type SwapRouteSerialized = {
   methodParameters: MethodParameters | undefined;
@@ -27,4 +28,5 @@ export type KVQuote = {
   error?: string;
   quote: SwapRouteSerialized;
   params: Parameters<typeof getSwapTransaction>[0];
+  tokenInfo: TokenInfo;
 };

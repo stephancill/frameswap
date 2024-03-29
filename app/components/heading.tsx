@@ -1,18 +1,12 @@
 import { twMerge } from "tailwind-merge";
 
-export function Pill({
+export function Heading({
   children,
   tw,
   ...props
 }: { children: React.ReactNode } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      tw={twMerge(
-        "flex flex-row items-center bg-[#1B1B1B] text-white border border-[#41434A] rounded-full",
-        tw
-      )}
-      {...props}
-    >
+    <div tw={twMerge("mb-5 font-bold italic text-[48px] mb-10", tw)} {...props}>
       {children}
     </div>
   );

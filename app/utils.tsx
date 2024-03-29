@@ -181,12 +181,18 @@ export function camelToSnakeCase(str: string) {
 export function formatWarpcastIntentUrl({
   chain,
   address,
+  text,
 }: {
   chain: string | number;
   address: string;
+  text?: string;
 }) {
   const frameUrl = `${APP_URL}/frames/${chain}/${address}`;
-  return `https://warpcast.com/~/compose?embeds[]=${encodeURIComponent(
-    frameUrl
-  )}`;
+
+  const searchParams = new URLSearchParams({
+    text: text ?? "",
+    ["embeds[]"]: frameUrl,
+  });
+
+  return `https://warpcast.com/~/compose?${searchParams.toString()}`;
 }

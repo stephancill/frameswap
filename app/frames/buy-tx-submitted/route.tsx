@@ -11,6 +11,7 @@ import { TESTNET_ENABLED } from "../../env";
 import { SwapRoute } from "@uniswap/smart-order-router";
 import { getSwapTransaction } from "../../uniswap";
 import { getClient } from "../../client";
+import { Heading } from "../../components/heading";
 
 type RelayStatusResponse =
   paths["/intents/status"]["get"]["responses"]["200"]["content"]["application/json"];
@@ -85,7 +86,7 @@ const handler = frames(async (ctx) => {
 
     if (checkResult.status === "success") {
       return {
-        image: <div tw="flex">Transaction successful!</div>,
+        image: <Heading>TRANSACTION SUCCESSFUL</Heading>,
         buttons: [
           <Button action="post" target={buyUrl}>
             Buy more
@@ -120,9 +121,13 @@ const handler = frames(async (ctx) => {
     ) {
       return {
         image: (
-          <div tw="flex">
-            Transaction in progress...{" "}
-            {checkResult.details ? `(${checkResult.details})` : ""}
+          <div tw="flex flex-col">
+            <Heading>TRANSACTION IN PROGRESS</Heading>
+            <div>
+              {checkResult.details
+                ? `${checkResult.details.toUpperCase()}`
+                : ""}
+            </div>
           </div>
         ),
         buttons: [
@@ -151,7 +156,7 @@ const handler = frames(async (ctx) => {
     }
 
     return {
-      image: <div tw="flex">Unknown transaction state</div>,
+      image: <Heading>UNKNOWN TRANSACTION STATE</Heading>,
       buttons: [
         <Button
           action="post"

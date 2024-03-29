@@ -53,7 +53,7 @@ export async function getTokenInfo({
         string
       ];
 
-      const client = getClient({ chainIdOrName: chainName });
+      const client = getClient({ chainIdOrName: chainIdOrName || chainName });
 
       return {
         id: json.id,

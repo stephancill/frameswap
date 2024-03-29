@@ -18,6 +18,7 @@ export const POST = frames(async (ctx) => {
   }
 
   const castUrl = formatWarpcastIntentUrl({
+    text: `Buy $${tokenInfo.symbol} with FRAMESWAP right here in your feed!`,
     chain: tokenInfo.chainId,
     address: tokenInfo.address,
   });
@@ -25,7 +26,6 @@ export const POST = frames(async (ctx) => {
   return {
     image: (
       <div tw="flex flex-col">
-        <div tw="mb-2">Token Info</div>
         <TokenDetail tokenInfo={tokenInfo} />
       </div>
     ),

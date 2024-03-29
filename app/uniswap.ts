@@ -145,11 +145,16 @@ function parseDeadline(deadline: string): number {
 export async function getAndPersistSwapTransaction({
   key,
   quoteParams,
+  extra,
 }: {
   quoteParams: Parameters<typeof getSwapTransaction>[0];
   key: string;
+  /** Additional data to be inserted in the kv store alongside the quote */
+  extra?: any;
 }) {
   await kv.set(key, JSON.stringify({ loading: true }));
+
+  console.log(quoteParams);
 
   return await getSwapTransaction(quoteParams)
     .then((quote) => {
@@ -174,7 +179,11 @@ export async function getAndPersistSwapTransaction({
       const value = {
         quote: newQuote,
         params: quoteParams,
+        ...extra,
       };
+
+      console.log(value);
+
       kv.set(key, JSON.stringify(value));
     })
     .catch((e) => {

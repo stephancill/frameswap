@@ -12,7 +12,7 @@ const handleRequest = frames(
     if (!tokenAddress || !chainNameOrId) {
       return {
         image: (
-          <div tw="flex flex-col">
+          <div tw="flex flex-col text-white">
             <div tw="mb-4">Search token to generate a cast</div>
             <div tw="flex flex-col">
               <div>or format the url like: </div>

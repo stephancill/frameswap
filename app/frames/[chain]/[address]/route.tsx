@@ -1,9 +1,9 @@
 import { Button } from "frames.js/next";
 import { NextRequest } from "next/server";
+import { Heading } from "../../../components/heading";
+import { Logo } from "../../../components/logo";
 import { TokenDetail } from "../../../components/token-detail";
 import { frames, tokenMiddleware } from "../../frames";
-import { APP_URL } from "../../../env";
-import { Logo } from "../../../components/logo";
 
 const frameHandler = async (
   req: NextRequest,
@@ -11,7 +11,7 @@ const frameHandler = async (
 ) => {
   return await frames(
     async (ctx) => {
-      const buttons = [5, 10, 20, 50].map((amountUsd) => (
+      const buttons = [5, 10, 20].map((amountUsd) => (
         <Button
           action="post"
           target={{
@@ -25,7 +25,7 @@ const frameHandler = async (
 
       if (!ctx.token) {
         return {
-          image: <div>Could not find token.</div>,
+          image: <Heading>COULD NOT FIND TOKEN</Heading>,
         };
       }
 
@@ -40,8 +40,19 @@ const frameHandler = async (
             </div>
           </div>
         ),
-        // Type safety issue
-        buttons: buttons as any,
+        textInput: "Enter amount to buy in USD",
+        buttons: [
+          ...buttons,
+          <Button
+            action="post"
+            target={{
+              pathname: "/buy",
+              query: { chain, address },
+            }}
+          >
+            Buy Custom
+          </Button>,
+        ] as any,
       };
     },
     {

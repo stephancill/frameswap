@@ -1,7 +1,7 @@
 import { Button } from "frames.js/next";
 import { getClient } from "../../client";
 import { TokenDetail } from "../../components/token-detail";
-import { DUMMY_TX_ADDRESS } from "../../const";
+import { CHAIN_SYMBOLS, DUMMY_TX_ADDRESS } from "../../const";
 import {
   APP_URL,
   FEE_PERCENTAGE_POINTS,
@@ -14,6 +14,8 @@ import {
 import { formatUsdDisplay } from "../../utils";
 import { frames, priceMiddleware, tokenMiddleware } from "../frames";
 import { Pill } from "../../components/pill";
+import { ChainIcon } from "../../components/chain-icon";
+import { Heading } from "../../components/heading";
 
 export const POST = frames(
   async (ctx) => {
@@ -22,11 +24,53 @@ export const POST = frames(
     }
 
     if (!ctx.token) {
-      return { image: <div>Token not found</div> };
+      return { image: <Heading>TOKEN NOT FOUND</Heading> };
+    }
+
+    try {
+      if (!ctx.searchParams.amountUsd && !ctx.message.inputText) {
+        throw new Error("Amount not found");
+      } else if (!ctx.searchParams.amountUsd) {
+        const amountUsd = parseFloat(ctx.message.inputText!);
+        if (isNaN(amountUsd)) {
+          throw new Error("Amount not found");
+        }
+      }
+    } catch (error) {
+      return {
+        image: (
+          <div tw="flex flex-col">
+            <Heading tw="mb-10">ENTER A VALID AMOUNT</Heading>
+            <div tw="mx-auto">
+              <TokenDetail tokenInfo={ctx.token} />
+            </div>
+          </div>
+        ),
+        textInput: "Enter amount to buy in USD",
+        buttons: [
+          <Button
+            action="post"
+            target={`/${ctx.token.chain}/${ctx.token.address}`}
+          >
+            ← Back
+          </Button>,
+          <Button
+            action="post"
+            target={{
+              pathname: "/buy",
+              query: { chain: ctx.token.chain, address: ctx.token.address },
+            }}
+          >
+            Buy Custom
+          </Button>,
+        ],
+      };
     }
 
     const client = getClient({ chainIdOrName: ctx.token?.chain });
-    const buyAmountUsd = parseFloat(ctx.searchParams.amountUsd);
+    const buyAmountUsd = parseFloat(
+      ctx.searchParams.amountUsd || ctx.message.inputText!
+    );
     const ethInputAmount = (buyAmountUsd / ctx.ethUsd).toString();
 
     const userId = ctx.message.requesterFid;
@@ -46,41 +90,44 @@ export const POST = frames(
     };
 
     // Get quote in the background
-    getAndPersistSwapTransaction({ key, quoteParams });
-
-    console.log(`${APP_URL}/chain-symbols/${client.chain.name}`);
+    getAndPersistSwapTransaction({
+      key,
+      quoteParams,
+      extra: { tokenInfo: ctx.token },
+    });
 
     return {
       image: (
         <div tw="flex flex-col">
+          <Heading tw="mb-10">BUY</Heading>
           <div tw="flex mb-10">
-            <div tw="text-white font-bold items-center">
-              BUYING{" "}
-              <div tw="inline mx-2">
-                <Pill>
-                  <div tw="px-4 py-2">${formatUsdDisplay(buyAmountUsd)}</div>{" "}
-                </Pill>{" "}
-              </div>{" "}
-              ON
-              <div tw="inline ml-2">
-                <Pill>
-                  <div tw="flex items-center px-4 py-2">
-                    <div>{client.chain.name.toUpperCase()}</div>
-                    <div>
-                      {" "}
-                      <img
-                        tw="w-10 h-10"
-                        src={`${APP_URL}/chain-symbols/${client.chainName}.svg`}
-                        alt=""
-                      />
+            <div tw="text-white items-center">
+              <Pill tw="mr-2">
+                <div tw="px-4 py-2">${formatUsdDisplay(buyAmountUsd)}</div>{" "}
+              </Pill>
+              <div tw="mr-3 text-gray-500">OF </div>
+              <Pill tw="mr-2">
+                <div tw="flex items-center py-2 px-4">
+                  {ctx.token?.image && (
+                    <div tw="mr-2 w-10 h-10 rounded-full overflow-hidden flex">
+                      <img tw="w-10 h-10" src={ctx.token.image} />
                     </div>
-                  </div>
-                </Pill>
-              </div>
+                  )}
+                  <div>{ctx.token.symbol}</div>
+                </div>
+              </Pill>
+              <div tw="mr-3 text-gray-500">ON</div>
+              <Pill>
+                <div tw="flex items-center px-4 py-2">
+                  <div>{client.chain.name.toUpperCase()}</div>
+                  {CHAIN_SYMBOLS.includes(client.chainName) && (
+                    <div>
+                      <ChainIcon chainName={client.chainName} />
+                    </div>
+                  )}
+                </div>
+              </Pill>
             </div>
-          </div>
-          <div tw="mx-auto">
-            <TokenDetail tokenInfo={ctx.token} />
           </div>
         </div>
       ),
