@@ -13,6 +13,8 @@ import JSBI from "jsbi";
 import { publicActionReverseMirage } from "reverse-mirage";
 import { createPublicClient, http } from "viem";
 import * as chains from "viem/chains";
+import { SwapRouteSerialized } from "./frames/types";
+import { kv } from "@vercel/kv";
 
 export const chainByName: { [key: string]: chains.Chain } = Object.entries(
   chains
@@ -32,39 +34,6 @@ export const chainById = Object.values(chains).reduce(
   {}
 );
 chainById[1] = { ...chains.mainnet }; // Convenience: rename 'homestead' to 'ethereum'
-
-export async function getEthUsdPrice(): Promise<number> {
-  const client = createPublicClient({
-    transport: http(),
-    chain: chains.mainnet,
-  });
-
-  // roundId uint80, answer int256, startedAt uint256, updatedAt uint256, answeredInRound uint80
-  const [, answer] = await client.readContract({
-    abi: [
-      {
-        inputs: [],
-        name: "latestRoundData",
-        outputs: [
-          { internalType: "uint80", name: "roundId", type: "uint80" },
-          { internalType: "int256", name: "answer", type: "int256" },
-          { internalType: "uint256", name: "startedAt", type: "uint256" },
-          { internalType: "uint256", name: "updatedAt", type: "uint256" },
-          { internalType: "uint80", name: "answeredInRound", type: "uint80" },
-        ],
-        stateMutability: "view",
-        type: "function",
-      },
-    ],
-    functionName: "latestRoundData",
-    // https://docs.chain.link/data-feeds/price-feeds/addresses?network=ethereum&page=1&search=usdc#ethereum-mainnet
-    address: "0x986b5E1e1755e3C2440e960477f25201B0a8bbD4",
-  });
-
-  const ethPriceUsd = (1 / Number(answer)) * 1e18;
-
-  return ethPriceUsd;
-}
 
 export async function getSwapTransaction({
   outTokenAddress,
@@ -171,4 +140,45 @@ async function getUniswapToken({
 
 function parseDeadline(deadline: string): number {
   return Math.floor(Date.now() / 1000) + parseInt(deadline);
+}
+
+export async function getAndPersistSwapTransaction({
+  key,
+  quoteParams,
+}: {
+  quoteParams: Parameters<typeof getSwapTransaction>[0];
+  key: string;
+}) {
+  await kv.set(key, JSON.stringify({ loading: true }));
+
+  return await getSwapTransaction(quoteParams)
+    .then((quote) => {
+      // Set value in kv
+      if (!quote) {
+        throw new Error("Quote not found");
+      }
+
+      const newQuote: SwapRouteSerialized = {
+        methodParameters: quote.methodParameters,
+        quote: {
+          currency: quote.quote.currency,
+          amount: quote.quote.toExact(),
+        },
+        gasPriceWei: quote.gasPriceWei.toString(),
+        estimatedGasUsedUSD: {
+          amount: quote.estimatedGasUsedUSD.toExact(),
+          currency: quote.estimatedGasUsedUSD.currency,
+        },
+        estimatedGasUsed: quote.estimatedGasUsed.toString(),
+      };
+      const value = {
+        quote: newQuote,
+        params: quoteParams,
+      };
+      kv.set(key, JSON.stringify(value));
+    })
+    .catch((e) => {
+      console.error(e);
+      kv.set(key, JSON.stringify({ error: e.message }));
+    });
 }

@@ -1,1 +1,7 @@
-export const { NODE_ENV, TESTNET_ENABLED, APP_URL } = process.env;
+export const {
+  NODE_ENV,
+  TESTNET_ENABLED,
+  APP_URL,
+  FEE_RECIPIENT_ADDRESS,
+  FEE_PERCENTAGE_POINTS,
+} = process.env;

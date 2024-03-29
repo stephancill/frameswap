@@ -16,7 +16,7 @@ import {
   zkSync,
   zora,
 } from "viem/chains";
-import { TESTNET_ENABLED } from "./env";
+import { APP_URL, TESTNET_ENABLED } from "./env";
 
 export function numberWithCommas(x: string | number) {
   var parts = x.toString().split(".");
@@ -176,4 +176,17 @@ export function vercelURL() {
 
 export function camelToSnakeCase(str: string) {
   return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
+}
+
+export function formatWarpcastIntentUrl({
+  chain,
+  address,
+}: {
+  chain: string | number;
+  address: string;
+}) {
+  const frameUrl = `${APP_URL}/frames/${chain}/${address}`;
+  return `https://warpcast.com/~/compose?embeds[]=${encodeURIComponent(
+    frameUrl
+  )}`;
 }

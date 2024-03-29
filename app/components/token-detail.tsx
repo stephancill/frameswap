@@ -13,8 +13,8 @@ export function TokenDetail({
         </div>
       )}
       <div tw="flex flex-col">
-        <div>Name: {tokenInfo.name}</div>
-        <div>Symbol: {tokenInfo.symbol}</div>
+        <div>{tokenInfo.name}</div>
+        <div>{tokenInfo.symbol}</div>
       </div>
     </div>
   );

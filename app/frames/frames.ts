@@ -20,33 +20,50 @@ const imageMiddleware: FramesMiddleware<any, {}> = async (ctx, next) => {
   return nextResult;
 };
 
-export const tokenMiddleware: FramesMiddleware<
-  any,
-  {
-    token?: Awaited<ReturnType<typeof getTokenInfo>> & {
-      chain: string;
-      address: string;
-    };
-  }
-> = async (ctx, next) => {
-  const url = new URL(ctx.url);
-  const tokenAddress = url.searchParams.get("address");
-  const chainNameOrId = url.searchParams.get("chain");
-
-  if (tokenAddress && chainNameOrId) {
-    const token = await getTokenInfo({
-      blockchain: chainNameOrId,
-      tokenAddress,
-    });
-
-    if (token) {
-      return next({
-        token: { ...token, chain: chainNameOrId, address: tokenAddress },
-      });
+export const tokenMiddleware = ({
+  chain: overrideChain,
+  address: overrideAddress,
+}:
+  | {
+      chain?: string;
+      address?: string;
     }
-  }
+  | undefined = {}) => {
+  const middlewareFn: FramesMiddleware<
+    any,
+    {
+      token?: Awaited<ReturnType<typeof getTokenInfo>> & {
+        chain: string;
+        address: string;
+      };
+    }
+  > = async (ctx, next) => {
+    const url = new URL(ctx.url);
+    const tokenAddress = overrideAddress || url.searchParams.get("address");
+    const chainIdOrNameRaw = overrideChain || url.searchParams.get("chain");
 
-  return next();
+    if (tokenAddress && chainIdOrNameRaw) {
+      const chainIdOrName: string | number = isNaN(parseInt(chainIdOrNameRaw))
+        ? chainIdOrNameRaw
+        : parseInt(chainIdOrNameRaw);
+
+      const client = getClient({ chainIdOrName });
+
+      const token = await getTokenInfo({
+        chainIdOrName: client.chainName,
+        addressOrId: tokenAddress,
+      });
+
+      if (token) {
+        return next({
+          token: { ...token, chain: client.chainName, address: tokenAddress },
+        });
+      }
+    }
+
+    return next();
+  };
+  return middlewareFn;
 };
 
 export const priceMiddleware: FramesMiddleware<
