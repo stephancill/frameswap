@@ -1,8 +1,10 @@
 import { Button } from "frames.js/next";
-import { frames } from "../frames";
-import { getTokenInfo } from "../../token";
-import { APP_URL } from "../../env";
+import { isAddress } from "viem";
 import { TokenDetail } from "../../components/token-detail";
+import { SEARCH_ADDRESS_OR_ID_STEP } from "../../const";
+import { getTokenInfo, searchTokens } from "../../token";
+import { formatWarpcastIntentUrl } from "../../utils";
+import { frames } from "../frames";
 
 export const POST = frames(async (ctx) => {
   if (!ctx.message) {
@@ -10,7 +12,33 @@ export const POST = frames(async (ctx) => {
   }
 
   if (ctx.message.inputText) {
-    if (ctx.searchParams.step === "chain") {
+    if (ctx.searchParams.step === SEARCH_ADDRESS_OR_ID_STEP) {
+      // We have query or address or ID
+      if (!isAddress(ctx.message.inputText)) {
+        const searchResults = await searchTokens({
+          query: ctx.message.inputText,
+        });
+
+        const buttons = searchResults
+          .map((token) => (
+            <Button
+              action="post"
+              target={{
+                pathname: "/search-confirm",
+                query: { tokenId: token.id },
+              }}
+            >
+              {token.name}
+            </Button>
+          ))
+          .slice(0, 4) as any;
+
+        return {
+          image: <div>Search results for "{ctx.message.inputText}"</div>,
+          buttons,
+        };
+      }
+
       return {
         image: <div>Enter chain name or ID for "{ctx.message.inputText}"</div>,
         textInput: "Chain name or ID",
@@ -29,8 +57,8 @@ export const POST = frames(async (ctx) => {
     } else if (ctx.searchParams.address) {
       // Handle chain name or ID
       const tokenInfo = await getTokenInfo({
-        tokenAddress: ctx.searchParams.address,
-        blockchain: ctx.message.inputText,
+        addressOrId: ctx.searchParams.address,
+        chainIdOrName: ctx.message.inputText.toLowerCase(),
       });
 
       if (!tokenInfo) {
@@ -40,7 +68,10 @@ export const POST = frames(async (ctx) => {
           buttons: [
             <Button
               action="post"
-              target={{ pathname: "/search", query: { step: "chain" } }}
+              target={{
+                pathname: "/search",
+                query: { step: SEARCH_ADDRESS_OR_ID_STEP },
+              }}
             >
               Search
             </Button>,
@@ -48,10 +79,10 @@ export const POST = frames(async (ctx) => {
         };
       }
 
-      const frameUrl = `${APP_URL}/frames/${ctx.message.inputText}/${ctx.searchParams.address}`;
-      const castUrl = `https://warpcast.com/~/compose?embeds[]=${encodeURIComponent(
-        frameUrl
-      )}`;
+      const castUrl = formatWarpcastIntentUrl({
+        chain: ctx.message.inputText,
+        address: ctx.searchParams.address,
+      });
 
       return {
         image: (
@@ -75,7 +106,10 @@ export const POST = frames(async (ctx) => {
     buttons: [
       <Button
         action="post"
-        target={{ pathname: "/search", query: { step: "chain" } }}
+        target={{
+          pathname: "/search",
+          query: { step: SEARCH_ADDRESS_OR_ID_STEP },
+        }}
       >
         Search
       </Button>,
