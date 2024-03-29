@@ -5,6 +5,7 @@ import { SEARCH_ADDRESS_OR_ID_STEP } from "../../const";
 import { getTokenInfo, searchTokens } from "../../token";
 import { formatWarpcastIntentUrl } from "../../utils";
 import { frames } from "../frames";
+import { Heading } from "../../components/heading";
 
 export const POST = frames(async (ctx) => {
   if (!ctx.message) {
@@ -34,7 +35,11 @@ export const POST = frames(async (ctx) => {
           .slice(0, 4) as any;
 
         return {
-          image: <div>Search results for "{ctx.message.inputText}"</div>,
+          image: (
+            <div tw="flex flex-col">
+              <Heading>Search results for "{ctx.message.inputText}"</Heading>
+            </div>
+          ),
           buttons,
         };
       }
@@ -101,7 +106,7 @@ export const POST = frames(async (ctx) => {
   }
 
   return {
-    image: <div>Something went wrong. Try again</div>,
+    image: <Heading>SOMETHING WENT WRONG. TRY AGAIN</Heading>,
     textInput: "Enter token address",
     buttons: [
       <Button

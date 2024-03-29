@@ -9,12 +9,14 @@ export function TokenDetail({
 }: {
   tokenInfo: NonNullable<Awaited<ReturnType<typeof getTokenInfo>>>;
 }) {
-  const chainName = getClient({ chainIdOrName: tokenInfo.chainId }).chainName;
+  const chainName = tokenInfo.chainId
+    ? getClient({ chainIdOrName: tokenInfo.chainId }).chainName
+    : null;
 
   return (
     <Pill>
       <div tw="p-5">
-        <div tw="mr-4">
+        <div tw={chainName && CHAIN_SYMBOLS.includes(chainName) ? "mr-4" : ""}>
           <div tw="relative">
             <div tw="h-20 w-20 rounded-full overflow-hidden">
               {tokenInfo.image ? (
@@ -30,7 +32,7 @@ export function TokenDetail({
                 </div>
               )}
             </div>
-            {CHAIN_SYMBOLS.includes(chainName) && (
+            {chainName && CHAIN_SYMBOLS.includes(chainName) && (
               <div tw="absolute h-10 w-10 -right-3 -bottom-1 bg-white items-center justify-center rounded-full overflow-hidden">
                 <ChainIcon tw="w-full h-full" chainName={chainName} />
               </div>

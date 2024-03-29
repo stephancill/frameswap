@@ -8,7 +8,7 @@ export function Pill({
   return (
     <div
       tw={twMerge(
-        "flex flex-row items-center bg-[#1B1B1B] text-white border border-[#41434A] rounded-full",
+        "flex flex-row items-center bg-[#1B1B1B] border border-[#41434A] rounded-full",
         tw
       )}
       {...props}

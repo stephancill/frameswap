@@ -82,6 +82,7 @@ export function serializeJsx(children: ReactNode): SerializedNode[] {
         return {
           type: serialized.type,
           props: serialized.props,
+          key: serialized.key,
         };
       }
     }) || []

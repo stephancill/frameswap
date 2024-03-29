@@ -154,8 +154,6 @@ export async function getAndPersistSwapTransaction({
 }) {
   await kv.set(key, JSON.stringify({ loading: true }));
 
-  console.log(quoteParams);
-
   return await getSwapTransaction(quoteParams)
     .then((quote) => {
       // Set value in kv
@@ -181,8 +179,6 @@ export async function getAndPersistSwapTransaction({
         params: quoteParams,
         ...extra,
       };
-
-      console.log(value);
 
       kv.set(key, JSON.stringify(value));
     })

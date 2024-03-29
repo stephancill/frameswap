@@ -3,6 +3,8 @@ import { TokenDetail } from "../components/token-detail";
 import { APP_URL } from "../env";
 import { frames, tokenMiddleware } from "./frames";
 import { SEARCH_ADDRESS_OR_ID_STEP } from "../const";
+import { Logo } from "../components/logo";
+import { Pill } from "../components/pill";
 
 const handleRequest = frames(
   async (ctx) => {
@@ -12,11 +14,16 @@ const handleRequest = frames(
     if (!tokenAddress || !chainNameOrId) {
       return {
         image: (
-          <div tw="flex flex-col text-white">
-            <div tw="mb-4">Search token to generate a cast</div>
-            <div tw="flex flex-col">
-              <div>or format the url like: </div>
-              {APP_URL}/{"<chain>"}/{"<address>"}
+          <div tw="flex flex-col">
+            <Logo></Logo>
+            <div tw="mb-4">SEARCH TOKEN TO GENERATE A CAST</div>
+            <div tw="flex flex-col text-gray-500">
+              <div tw="mb-2">or format the url like: </div>
+              <Pill>
+                <div tw="py-1 px-2">
+                  {APP_URL}/{"<chain>"}/{"<address>"}
+                </div>
+              </Pill>
             </div>
           </div>
         ),
