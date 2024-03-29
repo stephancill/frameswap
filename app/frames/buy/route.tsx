@@ -4,9 +4,16 @@ import { TokenDetail } from "../../components/token-detail";
 import { getSwapTransaction } from "../../uniswap";
 import { formatUsdDisplay } from "../../utils";
 import { frames, priceMiddleware, tokenMiddleware } from "../frames";
+import { kv } from "@vercel/kv";
+import { DUMMY_TX_ADDRESS } from "../../const";
+import { FACTORY_ADDRESS_MAP } from "@uniswap/v2-sdk";
 
 export const POST = frames(
   async (ctx) => {
+    if (!ctx.message) {
+      throw new Error("Message not found");
+    }
+
     if (!ctx.token) {
       return { image: <div>Token not found</div> };
     }
@@ -17,23 +24,41 @@ export const POST = frames(
 
     // Construct data with any constant address,
     // the user's address will replace it when we have tx data
-    const recipient = "0x8d25687829D6b85d9e0020B8c89e3Ca24dE20a89";
+    const recipient = DUMMY_TX_ADDRESS;
 
-    console.log({
-      blockchain: client.chain.id,
-      outTokenAddress: ctx.token.address,
-      ethInputAmountFormatted: ethInputAmount,
-      recipientAddress: recipient,
-    });
+    const userId = ctx.message.requesterFid;
+    const key = `quote:${userId}:${Date.now()}`;
 
-    const quote = await getSwapTransaction({
+    await kv.set(key, JSON.stringify({ loading: true }));
+
+    const quoteParams: {
+      chainId: number;
+      outTokenAddress: string;
+      ethInputAmountFormatted: string;
+      recipientAddress: string;
+    } = {
       chainId: client.chain.id,
       outTokenAddress: ctx.token.address,
       ethInputAmountFormatted: ethInputAmount,
       recipientAddress: recipient,
-    });
+    };
 
-    console.log({ quote });
+    // Get quote in the background
+    getSwapTransaction(quoteParams)
+      .then((quote) => {
+        // Set value in kv
+        const value = JSON.stringify({
+          quote: {
+            methodParameters: quote?.methodParameters,
+          },
+          params: quoteParams,
+        });
+        kv.set(key, value);
+      })
+      .catch((e) => {
+        console.error(e);
+        kv.set(key, JSON.stringify({ error: e.message }));
+      });
 
     return {
       image: (
@@ -48,13 +73,13 @@ export const POST = frames(
       ),
       buttons: [
         <Button
-          action="tx"
+          action="post"
           target={{
-            pathname: "/buy-tx",
-            query: { address: ctx.token.address, chain: ctx.token.chain },
+            pathname: "/quote",
+            query: { key },
           }}
         >
-          Buy
+          Get quote
         </Button>,
       ],
     };

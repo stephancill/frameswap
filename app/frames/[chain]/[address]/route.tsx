@@ -3,14 +3,13 @@ import { frames } from "../../frames";
 import { Button } from "frames.js/next";
 import { getTokenInfo } from "../../../token";
 import { TokenDetail } from "../../../components/token-detail";
+import { getClient } from "../../../client";
 
 const frameHandler = async (
   req: NextRequest,
   { params: { address, chain } }: { params: { chain: string; address: string } }
 ) => {
   return await frames(async (ctx) => {
-    console.log({ chain, address });
-
     // const buttons = [5, 10, 20, 50].map((amount) => (
     //   <Button
     //     action="post"
@@ -20,8 +19,14 @@ const frameHandler = async (
     //   </Button>
     // ));
 
+    const chainIdOrName: string | number = isNaN(parseInt(chain))
+      ? chain
+      : parseInt(chain);
+
+    const client = getClient({ chainIdOrName });
+
     const tokenInfo = await getTokenInfo({
-      blockchain: chain,
+      blockchain: client.chainName,
       tokenAddress: address,
     });
 
@@ -40,7 +45,10 @@ const frameHandler = async (
       buttons: [
         <Button
           action="post"
-          target={{ pathname: "/buy", query: { chain, address, amountUsd: 5 } }}
+          target={{
+            pathname: "/buy",
+            query: { chain: client.chainName, address, amountUsd: 5 },
+          }}
         >
           {`Buy $5`}
         </Button>,
@@ -48,7 +56,7 @@ const frameHandler = async (
           action="post"
           target={{
             pathname: "/buy",
-            query: { chain, address, amountUsd: 10 },
+            query: { chain: client.chainName, address, amountUsd: 10 },
           }}
         >
           {`Buy $10`}

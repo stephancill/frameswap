@@ -129,11 +129,15 @@ export function formatEtherDisplay(eth: bigint) {
   return parseFloat(formatEther(eth)).toPrecision(4);
 }
 
-export async function calculateSwapAuto({
+export async function createRelayCallAuto({
   connectedAddress,
+  call,
 }: {
   connectedAddress: `0x${string}`;
+  call: Omit<CallBody, "originChainId" | "user">;
 }) {
+  console.log({ TESTNET_ENABLED });
+
   const [chainBalances] = await Promise.all([
     getBalancesOnChains({
       address: connectedAddress,
@@ -144,16 +148,22 @@ export async function calculateSwapAuto({
     }),
   ]);
 
-  const tx = {};
-
   const autoChainId = chainBalances[0]?.chain.id;
 
   if (!autoChainId) {
     throw new Error("No chain found with balance");
   }
 
+  const { steps } = await createRelayCall({
+    ...call,
+    user: connectedAddress,
+    originChainId: autoChainId,
+  });
+  const relayTxData = steps[0].items?.[0].data;
+
   return {
-    tx,
+    steps,
+    tx: relayTxData,
     fundsChainId: autoChainId,
   };
 }
@@ -162,4 +172,8 @@ export function vercelURL() {
   return process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : undefined;
+}
+
+export function camelToSnakeCase(str: string) {
+  return str.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
 }

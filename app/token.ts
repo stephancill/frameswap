@@ -20,7 +20,7 @@ export async function getTokenInfo({
   try {
     const [coingecko, onchain] = await Promise.all([
       fetch(
-        `https://api.coingecko.com/api/v3/coins/${blockchain}/contract/${tokenAddress}`
+        `https://api.coingecko.com/api/v3/coins/${client.chainName}/contract/${tokenAddress}`
       ),
       client.getERC20({
         erc20: {

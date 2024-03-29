@@ -6,6 +6,7 @@
   "dependencies": {
     "@reservoir0x/relay-sdk": "^0.3.3",
     "@uniswap/smart-order-router": "3.20.1",
+    "@vercel/kv": "^1.0.1",
     "@vercel/og": "^0.6.2",
     "ethers": "^5.7.2",
     "frames.js": "^0.11.0",
@@ -28,7 +29,8 @@
     "dev": "next dev",
     "start": "next start",
     "build": "next build",
-    "lint": "next lint"
+    "lint": "next lint",
+    "postinstall": "patch-package"
   },
   "engines": {
     "node": ">=18.17.0"

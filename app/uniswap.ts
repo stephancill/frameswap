@@ -100,6 +100,7 @@ export async function getSwapTransaction({
   });
 
   const tokenIn = nativeOnChain(chain.id);
+
   const amountIn = CurrencyAmount.fromRawAmount(
     tokenIn,
     JSBI.BigInt(
