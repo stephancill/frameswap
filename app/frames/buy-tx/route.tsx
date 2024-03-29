@@ -55,7 +55,7 @@ export const POST = async function (req: NextRequest) {
     connectedAddress: connectedAddress as `0x${string}`,
   });
 
-  await kv.set(key, JSON.stringify({ ...value, steps }));
+  kv.set(key, JSON.stringify({ ...value, steps }));
 
   const relayTxData = steps[0].items?.[0].data;
 
