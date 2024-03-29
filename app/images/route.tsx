@@ -1,21 +1,27 @@
 import { ImageResponse } from "@vercel/og";
 import { NextRequest } from "next/server";
 import { deserializeJsx } from "../render-image";
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
+
+const regularFont = fs.readFile(
+  path.join(path.resolve(process.cwd(), "public"), "Roboto-Regular.ttf")
+);
+
+const boldFont = fs.readFile(
+  path.join(path.resolve(process.cwd(), "public"), "Roboto-Bold.ttf")
+);
+
+const boldItalicFont = fs.readFile(
+  path.join(path.resolve(process.cwd(), "public"), "Roboto-BoldItalic.ttf")
+);
 
 export async function GET(req: NextRequest) {
-  const [regularFont, boldFont, boldItalicFont] = await Promise.all([
-    fetch(new URL("/public/Roboto-Regular.ttf", import.meta.url)).then((res) =>
-      res.arrayBuffer()
-    ),
-    fetch(new URL("/public/Roboto-Bold.ttf", import.meta.url)).then((res) =>
-      res.arrayBuffer()
-    ),
-    fetch(new URL("/public/Roboto-BoldItalic.ttf", import.meta.url)).then(
-      (res) => res.arrayBuffer()
-    ),
-  ]);
+  const [regularFontData, boldFontData, boldItalicFontData] = await Promise.all(
+    [regularFont, boldFont, boldItalicFont]
+  );
 
   const serialized = req.nextUrl.searchParams.get("jsx");
 
@@ -34,17 +40,17 @@ export async function GET(req: NextRequest) {
     fonts: [
       {
         name: "Roboto",
-        data: regularFont,
+        data: regularFontData,
         weight: 400,
       },
       {
         name: "Roboto",
-        data: boldFont,
+        data: boldFontData,
         weight: 700,
       },
       {
         name: "Roboto",
-        data: boldItalicFont,
+        data: boldItalicFontData,
         weight: 700,
         style: "italic",
       },
