@@ -144,7 +144,7 @@ export async function createRelayCallAuto({
       // https://docs.relay.link/resources/supported-chains#supported-chains
       chains: TESTNET_ENABLED
         ? [baseSepolia]
-        : [zora, base, arbitrum, arbitrumNova, optimism, linea, zkSync],
+        : [zora, base, arbitrum, optimism],
     }),
   ]);
 
