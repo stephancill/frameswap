@@ -17,6 +17,7 @@ import { frames, priceMiddleware, tokenMiddleware } from "../frames";
 import { Pill } from "../../components/pill";
 import { ChainIcon } from "../../components/chain-icon";
 import { Heading } from "../../components/heading";
+import { kv } from "@vercel/kv";
 
 export const POST = frames(
   async (ctx) => {
@@ -122,18 +123,9 @@ export const POST = frames(
       feeRecipientAddress: FEE_RECIPIENT_ADDRESS,
     };
 
+    await kv.set(key, JSON.stringify({ loading: true }));
+
     // Get quote in the background
-    console.log(SWAP_ENDPOINT_URL!, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        key,
-        quoteParams,
-        extra: { tokenInfo: ctx.token },
-      }),
-    });
     fetch(SWAP_ENDPOINT_URL!, {
       method: "POST",
       headers: {
