@@ -4,4 +4,5 @@ export const {
   APP_URL,
   FEE_RECIPIENT_ADDRESS,
   FEE_PERCENTAGE_POINTS,
+  SWAP_ENDPOINT_URL,
 } = process.env;

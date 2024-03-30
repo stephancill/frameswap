@@ -6,6 +6,7 @@ import {
   APP_URL,
   FEE_PERCENTAGE_POINTS,
   FEE_RECIPIENT_ADDRESS,
+  SWAP_ENDPOINT_URL,
 } from "../../env";
 import {
   getAndPersistSwapTransaction,
@@ -122,11 +123,28 @@ export const POST = frames(
     };
 
     // Get quote in the background
-    getAndPersistSwapTransaction({
-      key,
-      quoteParams,
-      extra: { tokenInfo: ctx.token },
+    console.log(SWAP_ENDPOINT_URL!, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        key,
+        quoteParams,
+        extra: { tokenInfo: ctx.token },
+      }),
     });
+    fetch(SWAP_ENDPOINT_URL!, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        key,
+        quoteParams,
+        extra: { tokenInfo: ctx.token },
+      }),
+    }).catch(console.error);
 
     return {
       image: (
