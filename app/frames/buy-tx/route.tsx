@@ -43,10 +43,15 @@ export const POST = async function (req: NextRequest) {
     const tx = {
       ...quote.methodParameters,
       data: quote.methodParameters.calldata.replace(
-        DUMMY_TX_ADDRESS.slice(2),
-        connectedAddress.slice(2)
+        DUMMY_TX_ADDRESS.toLowerCase().slice(2),
+        connectedAddress.toLowerCase().slice(2)
       ),
     };
+
+    console.log({
+      before: quote.methodParameters.calldata,
+      after: tx.data,
+    });
 
     const { steps, fundsChainId } = await createRelayCallAuto({
       call: {
