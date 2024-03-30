@@ -4,7 +4,9 @@ import { Logo } from "./components/logo";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Frames Next.js Example",
+    title: "FRAMESWAP",
+    description:
+      "The easiest way to share and invest in tokens straight from your feed.",
     other: {
       ...(await fetchMetadata(
         new URL("/frames", process.env.APP_URL || "http://localhost:3000")
