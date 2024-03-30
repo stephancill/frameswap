@@ -71,6 +71,38 @@ export const POST = frames(
     const buyAmountUsd = parseFloat(
       ctx.searchParams.amountUsd || ctx.message.inputText!
     );
+
+    if (buyAmountUsd > 50) {
+      return {
+        image: (
+          <div tw="flex flex-col">
+            <Heading tw="mb-10">AMOUNT TOO HIGH ($50 LIMIT)</Heading>
+            <div tw="mx-auto">
+              <TokenDetail tokenInfo={ctx.token} />
+            </div>
+          </div>
+        ),
+        textInput: "Enter amount to buy in USD",
+        buttons: [
+          <Button
+            action="post"
+            target={`/${ctx.token.chain}/${ctx.token.address}`}
+          >
+            ← Back
+          </Button>,
+          <Button
+            action="post"
+            target={{
+              pathname: "/buy",
+              query: { chain: ctx.token.chain, address: ctx.token.address },
+            }}
+          >
+            Buy Custom
+          </Button>,
+        ],
+      };
+    }
+
     const ethInputAmount = (buyAmountUsd / ctx.ethUsd).toString();
 
     const userId = ctx.message.requesterFid;

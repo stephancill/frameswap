@@ -48,11 +48,6 @@ export const POST = async function (req: NextRequest) {
       ),
     };
 
-    console.log({
-      before: quote.methodParameters.calldata,
-      after: tx.data,
-    });
-
     const { steps, fundsChainId } = await createRelayCallAuto({
       call: {
         destinationChainId: value.params.chainId,
