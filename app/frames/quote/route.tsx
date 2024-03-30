@@ -28,7 +28,10 @@ export const POST = frames(async (ctx) => {
     return {
       image: <Heading>FETCHING QUOTE</Heading>,
       buttons: [
-        <Button action="post" target={{ pathname: "/quote", query: { key } }}>
+        <Button
+          action="post"
+          target={{ pathname: "/quote", query: { key, time: Date.now() } }}
+        >
           ⟲ Refresh
         </Button>,
       ],

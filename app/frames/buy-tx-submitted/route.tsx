@@ -136,7 +136,10 @@ const handler = frames(async (ctx) => {
           </Button>,
           <Button
             action="post"
-            target={{ pathname: "/buy-tx-submitted", query: { key } }}
+            target={{
+              pathname: "/buy-tx-submitted",
+              query: { key, time: Date.now() },
+            }}
           >
             ⟲ Check again
           </Button>,
@@ -160,7 +163,10 @@ const handler = frames(async (ctx) => {
       buttons: [
         <Button
           action="post"
-          target={{ pathname: "/buy-tx-submitted", query: { key } }}
+          target={{
+            pathname: "/buy-tx-submitted",
+            query: { key, time: Date.now() },
+          }}
         >
           ⟲ Check again
         </Button>,
