@@ -104,7 +104,7 @@ export async function renderImage(element: JSX.Element) {
 }
 
 export function imageUrl(image: JSX.Element) {
-  const imageJson = JSON.stringify(serializeJsx(<Scaffold>{image}</Scaffold>));
+  const imageJson = JSON.stringify(serializeJsx(image));
   const imageUrl = `${new URL(
     "/images",
     process.env.APP_URL

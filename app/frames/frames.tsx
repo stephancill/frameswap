@@ -1,23 +1,26 @@
 import { createFrames } from "frames.js/next";
 import { FramesMiddleware } from "frames.js/types";
 import { isFrameDefinition } from "frames.js/utils";
+import { getClient } from "../client";
+import { Scaffold } from "../components/scaffold";
 import { imageUrl } from "../render-image";
 import { getTokenInfo } from "../token";
-import { getClient } from "../client";
 import { getEthUsdPrice } from "../utils";
 
 const imageMiddleware: FramesMiddleware<any, {}> = async (ctx, next) => {
   const nextResult = await next();
 
-  if (isFrameDefinition(nextResult) && typeof nextResult.image !== "string") {
-    const image = imageUrl(nextResult.image) + `&${Date.now()}`;
-    return {
-      ...nextResult,
-      image,
-    };
+  if (!isFrameDefinition(nextResult) || typeof nextResult.image === "string") {
+    return nextResult;
   }
 
-  return nextResult;
+  const image =
+    imageUrl(<Scaffold>{nextResult.image}</Scaffold>) + `&${Date.now()}`;
+
+  return {
+    ...nextResult,
+    image,
+  };
 };
 
 export const tokenMiddleware = ({

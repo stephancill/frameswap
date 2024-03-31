@@ -48,7 +48,7 @@ export function TokenDetail({
         </div>
 
         {tokenInfo.priceData && (
-          <>
+          <div>
             <div>
               <div tw="h-[70px] w-[1px] bg-[#41434A] mx-4"></div>
             </div>
@@ -69,7 +69,7 @@ export function TokenDetail({
                 %
               </div>
             </div>
-          </>
+          </div>
         )}
       </div>
     </Pill>

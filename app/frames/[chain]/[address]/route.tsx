@@ -1,9 +1,8 @@
 import { Button } from "frames.js/next";
 import { NextRequest } from "next/server";
 import { Heading } from "../../../components/heading";
-import { Logo } from "../../../components/logo";
-import { TokenDetail } from "../../../components/token-detail";
 import { COINGECKO_CACHE_TTL } from "../../../const";
+import { APP_URL } from "../../../env";
 import { frames, tokenMiddleware } from "../../frames";
 
 const frameHandler = async (
@@ -31,16 +30,7 @@ const frameHandler = async (
       }
 
       return {
-        image: (
-          <div tw="flex flex-col">
-            <div tw="mb-10">
-              <Logo />
-            </div>
-            <div tw="mx-auto flex flex-col">
-              <TokenDetail tokenInfo={ctx.token} />
-            </div>
-          </div>
-        ),
+        image: `${APP_URL}/images/${chain}/${address}`,
         textInput: "Enter amount to buy in USD",
         buttons: [
           ...buttons,
@@ -54,9 +44,6 @@ const frameHandler = async (
             Buy Custom
           </Button>,
         ] as any,
-        headers: {
-          "Cache-Control": `max-age=${COINGECKO_CACHE_TTL}`,
-        },
       };
     },
     {
