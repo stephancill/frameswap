@@ -19,4 +19,5 @@ export const CHAIN_SYMBOLS = [
 export const COINGECKO_CHAIN_OVERRIDES: Record<string, string> = {
   "optimistic-ethereum": "optimism",
   "arbitrum-one": "arbitrum",
+  "zora-network": "zora",
 };
