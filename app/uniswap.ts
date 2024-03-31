@@ -11,7 +11,7 @@ import {
 import { ethers } from "ethers";
 import JSBI from "jsbi";
 import { publicActionReverseMirage } from "reverse-mirage";
-import { createPublicClient, http } from "viem";
+import { createPublicClient, http, parseUnits } from "viem";
 import * as chains from "viem/chains";
 import { SwapRouteSerialized } from "./frames/types";
 import { kv } from "@vercel/kv";
@@ -73,7 +73,7 @@ export async function getSwapTransaction({
   const amountIn = CurrencyAmount.fromRawAmount(
     tokenIn,
     JSBI.BigInt(
-      ethers.utils.parseUnits(ethInputAmountFormatted, tokenIn.decimals)
+      parseUnits(ethInputAmountFormatted, tokenIn.decimals).toString()
     )
   );
 
