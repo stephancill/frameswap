@@ -76,7 +76,7 @@ export const POST = frames(async (ctx) => {
       <div tw="flex flex-col">
         <Heading tw="mb-10">QUOTE</Heading>
         <div tw="flex flex-row items-center">
-          <Pill tw="inline">
+          <Pill>
             <div tw="flex items-center pl-4 pr-2 py-2">
               <div>{ethInputFormatted}</div>{" "}
               <div>
@@ -86,7 +86,7 @@ export const POST = frames(async (ctx) => {
             </div>
           </Pill>
           <div tw="mx-4">FOR</div>
-          <Pill tw="inline">
+          <Pill>
             <div tw="flex items-center pl-4 pr-2 py-2">
               <div tw="mr-2">{tokenOutputFormatted}</div>{" "}
               {value.tokenInfo?.image && (
