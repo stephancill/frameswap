@@ -29,11 +29,9 @@ export async function loadFonts() {
 export function jsxToImageResponse({
   jsx,
   fonts: { boldFontData, boldItalicFontData, regularFontData },
-  headers,
 }: {
   jsx: JSX.Element;
   fonts: Awaited<ReturnType<typeof loadFonts>>;
-  headers?: HeadersInit;
 }) {
   const width = 1000;
   const height = Math.round(width * 1.91);
@@ -59,6 +57,5 @@ export function jsxToImageResponse({
         style: "italic",
       },
     ],
-    headers,
   });
 }

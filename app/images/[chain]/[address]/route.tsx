@@ -52,9 +52,15 @@ export async function GET(
     const imageResponse = jsxToImageResponse({
       jsx: imageJsx,
       fonts,
-      headers: { "Cache-Control": `public, max-age=${COINGECKO_CACHE_TTL}` },
     });
 
-    return imageResponse;
+    const imageData = await imageResponse.arrayBuffer();
+
+    return new Response(imageData, {
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": `public, max-age=${COINGECKO_CACHE_TTL}`,
+      },
+    });
   }
 }
