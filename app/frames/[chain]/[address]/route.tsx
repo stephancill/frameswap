@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { Heading } from "../../../components/heading";
 import { Logo } from "../../../components/logo";
 import { TokenDetail } from "../../../components/token-detail";
+import { COINGECKO_CACHE_TTL } from "../../../const";
 import { frames, tokenMiddleware } from "../../frames";
 
 const frameHandler = async (
@@ -35,7 +36,7 @@ const frameHandler = async (
             <div tw="mb-10">
               <Logo />
             </div>
-            <div tw="mx-auto">
+            <div tw="mx-auto flex flex-col">
               <TokenDetail tokenInfo={ctx.token} />
             </div>
           </div>
@@ -53,6 +54,9 @@ const frameHandler = async (
             Buy Custom
           </Button>,
         ] as any,
+        headers: {
+          "Cache-Control": `max-age=${COINGECKO_CACHE_TTL}`,
+        },
       };
     },
     {

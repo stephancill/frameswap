@@ -1,6 +1,8 @@
+import { twMerge } from "tailwind-merge";
 import { getClient } from "../client";
 import { CHAIN_SYMBOLS } from "../const";
 import { getTokenInfo } from "../token";
+import { formatUsdDisplay, formatUsdPriceDisplay } from "../utils";
 import { ChainIcon } from "./chain-icon";
 import { Pill } from "./pill";
 
@@ -15,7 +17,7 @@ export function TokenDetail({
 
   return (
     <Pill>
-      <div tw="p-5">
+      <div tw="p-5 items-center">
         <div tw={chainName && CHAIN_SYMBOLS.includes(chainName) ? "mr-4" : ""}>
           <div tw="relative">
             <div tw="h-20 w-20 rounded-full overflow-hidden">
@@ -44,6 +46,31 @@ export function TokenDetail({
           <div tw="font-bold text-[36px]">{tokenInfo.symbol}</div>
           <div tw="text-[30px]">{tokenInfo.name}</div>
         </div>
+
+        {tokenInfo.priceData && (
+          <>
+            <div>
+              <div tw="h-[70px] w-[1px] bg-[#41434A] mx-4"></div>
+            </div>
+            <div tw="items-center flex flex-col">
+              <div tw="mr-1">
+                ${formatUsdPriceDisplay(tokenInfo.priceData.price)}
+              </div>
+              <div
+                tw={twMerge(
+                  "ml-2 text-[30px]",
+                  tokenInfo.priceData.priceChangePercentage24h > 0
+                    ? "text-green-500"
+                    : "text-gray-500"
+                )}
+              >
+                {tokenInfo.priceData.priceChangePercentage24h > 0 ? "+" : ""}
+                {formatUsdDisplay(tokenInfo.priceData.priceChangePercentage24h)}
+                %
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </Pill>
   );

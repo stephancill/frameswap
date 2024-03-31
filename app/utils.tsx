@@ -125,6 +125,12 @@ export function formatUsdDisplay(usd: number | string) {
   );
 }
 
+export function formatUsdPriceDisplay(usd: number | string) {
+  const usdNumber = typeof usd === "string" ? parseFloat(usd) : usd;
+
+  return numberWithCommas(usdNumber.toPrecision(4));
+}
+
 export function formatEtherDisplay(eth: bigint) {
   return parseFloat(formatEther(eth)).toPrecision(4);
 }

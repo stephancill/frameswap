@@ -1,7 +1,7 @@
 import { publicActionReverseMirage } from "reverse-mirage";
 import { isAddress } from "viem";
 import { getClient } from "./client";
-import { COINGECKO_CHAIN_OVERRIDES } from "./const";
+import { COINGECKO_CACHE_TTL, COINGECKO_CHAIN_OVERRIDES } from "./const";
 
 export type TokenInfo = {
   id?: string;
@@ -11,6 +11,13 @@ export type TokenInfo = {
   name: string;
   url: string;
   image?: string;
+  priceData?: {
+    price: number;
+    priceChange24h: number;
+    priceChangePercentage24h: number;
+    marketCap: number;
+  };
+  lastUpdated?: string;
 };
 
 export async function getTokenInfo({
@@ -31,7 +38,7 @@ export async function getTokenInfo({
     const [coingecko, onchain] = await Promise.all([
       fetch(coingeckoUrl, {
         next: {
-          revalidate: 3600,
+          revalidate: parseInt(COINGECKO_CACHE_TTL),
         },
       }),
       isAddress(addressOrId) && chainIdOrName
@@ -70,6 +77,14 @@ export async function getTokenInfo({
         chainId: client.chain.id,
         address,
         url: `https://www.coingecko.com/en/coins/${json.id}`,
+        priceData: {
+          price: json.market_data.current_price.usd,
+          priceChange24h: json.market_data.price_change_24h,
+          priceChangePercentage24h:
+            json.market_data.price_change_percentage_24h,
+          marketCap: json.market_data.market_cap.usd,
+        },
+        lastUpdated: json.last_updated,
       };
     }
 
