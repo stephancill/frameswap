@@ -91,17 +91,6 @@ const handler = frames(async (ctx) => {
           <Button action="post" target={buyUrl}>
             Buy more
           </Button>,
-          checkResult.inTxHashes?.[0] ? (
-            <Button
-              action="post"
-              target={getBlockExplorerTarget({
-                txHash: checkResult.inTxHashes[0],
-                key,
-              })}
-            >
-              In tx ↗︎
-            </Button>
-          ) : null,
           checkResult.txHashes?.[0] ? (
             <Button
               action="post"
@@ -143,17 +132,6 @@ const handler = frames(async (ctx) => {
           >
             ⟲ Check again
           </Button>,
-          checkResult.inTxHashes?.[0] ? (
-            <Button
-              action="post"
-              target={getBlockExplorerTarget({
-                txHash: checkResult.inTxHashes[0],
-                key,
-              })}
-            >
-              In tx ↗︎
-            </Button>
-          ) : null,
         ],
       };
     }
