@@ -56,11 +56,6 @@ export async function GET(
 
     const imageData = await imageResponse.arrayBuffer();
 
-    console.log({
-      "Content-Type": "image/png",
-      "Cache-Control": `public, max-age=${COINGECKO_CACHE_TTL}`,
-    });
-
     return new Response(imageData, {
       headers: {
         "Content-Type": "image/png",

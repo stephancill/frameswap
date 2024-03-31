@@ -67,11 +67,8 @@ export const POST = frames(async (ctx) => {
   const ethInputFormatted = formatEtherDisplay(
     parseEther(value.params.ethInputAmountFormatted)
   );
-  const usdInputFormatted = formatUsdDisplay(usdInput);
-  const totalFeesUsdFormatted = formatUsdDisplay(gasInUsd);
-  const quoteRateFormatted = formatEtherDisplay(
-    BigInt(Math.floor(quoteRate * 1e18))
-  );
+  const usdInputFormatted = formatUsdDisplay(usdInput - feeInUsd);
+  const totalFeesUsdFormatted = formatUsdDisplay(totalFees);
   const tokenOutputFormatted = formatUsdDisplay(value.quote.quote.amount);
 
   return {
@@ -98,7 +95,7 @@ export const POST = frames(async (ctx) => {
                 </div>
               )}
               <div tw="mr-2">{value.quote.quote.currency.symbol}</div>
-              <div tw="text-gray-500">@ ${quoteRateFormatted}</div>
+              <div tw="text-gray-500">${usdInputFormatted}</div>
             </div>
           </Pill>
         </div>

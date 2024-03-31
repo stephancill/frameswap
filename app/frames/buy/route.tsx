@@ -105,7 +105,11 @@ export const POST = frames(
       };
     }
 
-    const ethInputAmount = (buyAmountUsd / ctx.ethUsd).toString();
+    const ethInputAmount = buyAmountUsd / ctx.ethUsd;
+    // Used to calculate the eth input amount: input / (1-fee) = inputWithFee
+    const nonFeeFactor =
+      1 - (FEE_PERCENTAGE_POINTS ? parseInt(FEE_PERCENTAGE_POINTS) / 100 : 0);
+    const ethInputAmountWithFee = (ethInputAmount / nonFeeFactor).toString();
 
     const userId = ctx.message.requesterFid;
     const key = `quote:${userId}:${Date.now()}`;
@@ -113,7 +117,7 @@ export const POST = frames(
     const quoteParams: Parameters<typeof getSwapTransaction>[0] = {
       chainId: client.chain.id,
       outTokenAddress: ctx.token.address,
-      ethInputAmountFormatted: ethInputAmount,
+      ethInputAmountFormatted: ethInputAmountWithFee,
       // Construct data with any constant address,
       // the user's address will replace it when we have tx data
       recipientAddress: DUMMY_TX_ADDRESS,
