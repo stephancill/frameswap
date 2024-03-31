@@ -21,6 +21,7 @@ export type KVTransacted = {
   steps: Execute["steps"];
   quote: SwapRouteSerialized;
   params: Parameters<typeof getSwapTransaction>[0];
+  tokenInfo: TokenInfo;
 };
 
 export type KVQuote = {

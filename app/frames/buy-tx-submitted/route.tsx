@@ -1,17 +1,16 @@
 import {
-  Execute,
   MAINNET_RELAY_API,
   TESTNET_RELAY_API,
   paths,
 } from "@reservoir0x/relay-sdk";
 import { kv } from "@vercel/kv";
 import { Button } from "frames.js/next";
-import { frames } from "../frames";
-import { TESTNET_ENABLED } from "../../env";
-import { SwapRoute } from "@uniswap/smart-order-router";
-import { getSwapTransaction } from "../../uniswap";
 import { getClient } from "../../client";
 import { Heading } from "../../components/heading";
+import { TESTNET_ENABLED } from "../../env";
+import { formatUsdDisplay, formatWarpcastIntentUrl } from "../../utils";
+import { frames } from "../frames";
+import { KVTransacted } from "../types";
 
 type RelayStatusResponse =
   paths["/intents/status"]["get"]["responses"]["200"]["content"]["application/json"];
@@ -38,11 +37,7 @@ const handler = frames(async (ctx) => {
       throw new Error("Key not found");
     }
 
-    const value = await kv.get<{
-      steps: Execute["steps"];
-      quote: SwapRoute;
-      params: Parameters<typeof getSwapTransaction>[0];
-    }>(key);
+    const value = await kv.get<KVTransacted>(key);
 
     if (!value) {
       throw new Error("Transaction not found");
@@ -75,6 +70,25 @@ const handler = frames(async (ctx) => {
 
     const buyUrl = `/${value.params.chainId}/${value.params.outTokenAddress}`;
 
+    const castUrl = formatWarpcastIntentUrl({
+      text: `I just bought ${formatUsdDisplay(value.quote.quote.amount)} ${
+        value.tokenInfo.symbol
+      } right from my feed using FRAMESWAP 😎⚡️`,
+      chain: value.tokenInfo.chainId,
+      address: value.tokenInfo.address,
+    });
+    const shareButton = (
+      <Button action="link" target={castUrl}>
+        Share
+      </Button>
+    );
+
+    const buyMoreButton = (
+      <Button action="post" target={buyUrl}>
+        ⟲ Buy more
+      </Button>
+    );
+
     // Report progress
     const checkResult = (await relayResponse.json()) as RelayStatusResponse;
 
@@ -88,9 +102,8 @@ const handler = frames(async (ctx) => {
       return {
         image: <Heading>TRANSACTION SUCCESSFUL</Heading>,
         buttons: [
-          <Button action="post" target={buyUrl}>
-            Buy more
-          </Button>,
+          buyMoreButton,
+          shareButton,
           checkResult.txHashes?.[0] ? (
             <Button
               action="post"
@@ -120,9 +133,8 @@ const handler = frames(async (ctx) => {
           </div>
         ),
         buttons: [
-          <Button action="post" target={buyUrl}>
-            Buy more
-          </Button>,
+          buyMoreButton,
+          shareButton,
           <Button
             action="post"
             target={{
