@@ -148,9 +148,7 @@ export async function createRelayCallAuto({
     getBalancesOnChains({
       address: connectedAddress,
       // https://docs.relay.link/resources/supported-chains#supported-chains
-      chains: TESTNET_ENABLED
-        ? [baseSepolia]
-        : [zora, base, arbitrum, optimism],
+      chains: TESTNET_ENABLED ? [baseSepolia] : [zora, base, optimism], // Arbitrum is not supported by warpcast
     }),
   ]);
 
