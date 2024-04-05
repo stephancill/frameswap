@@ -78,6 +78,6 @@ export const priceMiddleware: FramesMiddleware<
 };
 
 export const frames = createFrames({
-  basePath: "/frames",
+  baseUrl: `${process.env.APP_URL}/frames`,
   middleware: [imageMiddleware],
 });
