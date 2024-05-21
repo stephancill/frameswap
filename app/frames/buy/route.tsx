@@ -1,23 +1,26 @@
+import { kv } from "@vercel/kv";
+import { randomBytes } from "crypto";
 import { Button } from "frames.js/next";
 import { getClient } from "../../client";
+import { ChainIcon } from "../../components/chain-icon";
+import { Heading } from "../../components/heading";
+import { Pill } from "../../components/pill";
 import { TokenDetail } from "../../components/token-detail";
 import { CHAIN_SYMBOLS, DUMMY_TX_ADDRESS } from "../../const";
 import {
-  APP_URL,
   FEE_PERCENTAGE_POINTS,
   FEE_RECIPIENT_ADDRESS,
   SWAP_ENDPOINT_URL,
 } from "../../env";
-import {
-  getAndPersistSwapTransaction,
-  getSwapTransaction,
-} from "../../uniswap";
+import { getSwapTransaction } from "../../uniswap";
 import { formatUsdDisplay } from "../../utils";
 import { frames, priceMiddleware, tokenMiddleware } from "../frames";
-import { Pill } from "../../components/pill";
-import { ChainIcon } from "../../components/chain-icon";
-import { Heading } from "../../components/heading";
-import { kv } from "@vercel/kv";
+
+function generateRandomId(): string {
+  const length = 32;
+  const bytes = randomBytes(length);
+  return bytes.toString("hex").substring(0, length * 2 - 2);
+}
 
 export const POST = frames(
   async (ctx) => {
@@ -111,7 +114,7 @@ export const POST = frames(
       1 - (FEE_PERCENTAGE_POINTS ? parseInt(FEE_PERCENTAGE_POINTS) / 100 : 0);
     const ethInputAmountWithFee = (ethInputAmount / nonFeeFactor).toString();
 
-    const userId = ctx.message.requesterFid;
+    const userId = generateRandomId();
     const key = `quote:${userId}:${Date.now()}`;
 
     const quoteParams: Parameters<typeof getSwapTransaction>[0] = {

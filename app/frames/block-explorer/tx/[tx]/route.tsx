@@ -16,7 +16,7 @@ export const POST = async (
     const htmlString = await explorerRes.text();
     const { frame } = getFrame({ htmlString, url });
     return {
-      image: frame.image,
+      image: frame.image!,
       buttons: [
         back ? (
           <Button action="post" target={back}>

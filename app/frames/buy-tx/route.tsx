@@ -1,24 +1,20 @@
 import type { SwapRoute } from "@uniswap/smart-order-router";
 import { kv } from "@vercel/kv";
+import { TransactionTargetResponse } from "frames.js";
+import { DUMMY_TX_ADDRESS } from "../../const";
 import { getSwapTransaction } from "../../uniswap";
 import { createRelayCallAuto } from "../../utils";
 import { frames } from "../frames";
-import { NextRequest } from "next/server";
-import { TransactionTargetResponse, getFrameMessage } from "frames.js";
-import { DUMMY_TX_ADDRESS } from "../../const";
 
-export const POST = async function (req: NextRequest) {
+export const POST = frames(async (ctx) => {
   try {
-    const json = await req.json();
-    const { connectedAddress } = await getFrameMessage(json, {
-      fetchHubContext: false,
-    });
+    const connectedAddress = ctx.message?.connectedAddress;
 
     if (!connectedAddress) {
-      throw new Error("Message not found");
+      throw new Error("No connected address found");
     }
 
-    const key = req.nextUrl.searchParams.get("key");
+    const key = ctx.searchParams.key;
 
     if (!key) {
       throw new Error("Key not found");
@@ -76,4 +72,4 @@ export const POST = async function (req: NextRequest) {
     console.error(error);
     return Response.json({ message: "Something went wrong" }, { status: 500 });
   }
-};
+});

@@ -1,3 +1,4 @@
+import { ClientProtocolHandler, openframes } from "frames.js/middleware";
 import { createFrames } from "frames.js/next";
 import { FramesMiddleware } from "frames.js/types";
 import { isFrameDefinition } from "frames.js/utils";
@@ -77,7 +78,49 @@ export const priceMiddleware: FramesMiddleware<
   return next({ ethUsd: ethPrice });
 };
 
+const openFramesHandler: ClientProtocolHandler<{
+  buttonIndex: any;
+  inputText: any;
+  connectedAddress: any;
+  transactionId: any;
+  state: any;
+}> = {
+  isValidPayload(body) {
+    const rawBody = body as any;
+    return (
+      rawBody.untrustedData && rawBody.untrustedData.buttonIndex !== undefined
+    );
+  },
+  async getFrameMessage(body) {
+    const rawBody = body as any;
+
+    return {
+      buttonIndex: rawBody.untrustedData.buttonIndex,
+      inputText: rawBody.untrustedData.inputText,
+      connectedAddress: rawBody.untrustedData.address,
+      transactionId: rawBody.untrustedData.transactionId,
+      state: rawBody.untrustedData.state,
+    };
+  },
+};
+
 export const frames = createFrames({
   baseUrl: `${process.env.APP_URL}/frames`,
-  middleware: [imageMiddleware],
+  middleware: [
+    imageMiddleware,
+    openframes({
+      clientProtocol: {
+        id: "xmtp",
+        version: "2024-02-09",
+      },
+      handler: openFramesHandler,
+    }),
+    openframes({
+      clientProtocol: {
+        id: "*",
+        version: "*",
+      },
+      handler: openFramesHandler,
+    }),
+  ],
 });
