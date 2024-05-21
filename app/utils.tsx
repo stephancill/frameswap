@@ -7,13 +7,10 @@ import {
 import { Chain, createPublicClient, formatEther, http } from "viem";
 import {
   arbitrum,
-  arbitrumNova,
   base,
   baseSepolia,
-  linea,
   mainnet,
   optimism,
-  zkSync,
   zora,
 } from "viem/chains";
 import { APP_URL, TESTNET_ENABLED } from "./env";
@@ -148,11 +145,17 @@ export async function createRelayCallAuto({
     getBalancesOnChains({
       address: connectedAddress,
       // https://docs.relay.link/resources/supported-chains#supported-chains
-      chains: TESTNET_ENABLED ? [baseSepolia] : [zora, base, optimism], // Arbitrum is not supported by warpcast
+      chains: TESTNET_ENABLED
+        ? [baseSepolia]
+        : [zora, base, optimism, arbitrum],
+      minBalance: call.txs?.[0].value ? BigInt(call.txs?.[0].value) : undefined,
     }),
   ]);
 
-  const autoChainId = chainBalances[0]?.chain.id;
+  // Prefer the destination chain if it has a balance
+  const autoChainId =
+    chainBalances.find((b) => b.chain.id === call.destinationChainId)?.chain
+      .id || chainBalances[0]?.chain.id;
 
   if (!autoChainId) {
     throw new Error("No chain found with balance");

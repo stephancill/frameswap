@@ -1343,10 +1343,10 @@ form-data@^4.0.0:
     combined-stream "^1.0.8"
     mime-types "^2.1.12"
 
-frames.js@^0.12.1:
-  version "0.12.1"
-  resolved "https://registry.yarnpkg.com/frames.js/-/frames.js-0.12.1.tgz#1e0b43fcad47d29206b1962f21d53f3e0163e77e"
-  integrity sha512-AXJ2MlnBrlKdFQ5GOdOCHNd7oSLZdAApRIU6JNoGpN0qrQdVggegKAdl8M8A11MPAQSy9jMXFnmsPVcv+Py6Ew==
+frames.js@^0.13.2:
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/frames.js/-/frames.js-0.13.2.tgz#035b67fad4bdd9384f6801e2fe1f9fc292c575a4"
+  integrity sha512-pDofWf4X4ZfEzKz0aASRaNBxDoLvmx69ktOmnXds0GCoQd2KMR4tORcP++gdDFSIps+IDWZLdIeir+8DcRamXw==
   dependencies:
     "@vercel/og" "^0.6.2"
     cheerio "^1.0.0-rc.12"
