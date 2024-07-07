@@ -1349,10 +1349,10 @@ form-data@^4.0.0:
     combined-stream "^1.0.8"
     mime-types "^2.1.12"
 
-frames.js@^0.16.0:
-  version "0.16.0"
-  resolved "https://registry.yarnpkg.com/frames.js/-/frames.js-0.16.0.tgz#29d3332a8347193bc5e3625207d93d1520bff680"
-  integrity sha512-JZoQZse2HFOqPzpAqgf6IFHjUt5fbBwuLwbAsCR9F8YuvV9eeVXoqoTO6ZG5zWOfvo8IWLlHWVbbELE0E6e6AA==
+frames.js@^0.17.3:
+  version "0.17.3"
+  resolved "https://registry.yarnpkg.com/frames.js/-/frames.js-0.17.3.tgz#e7bf1e9ab2e2dd35a9f9e2f32e65c47c16d34f53"
+  integrity sha512-sAI/fb9oTbBWeMcXFQCjKHPFcMzo5D7ZvIQBrJeSqgPgwGUcBBhwCadDR1lEhbJJ+QOJu7mjNQ3i/a1v9rKUIw==
   dependencies:
     "@vercel/og" "^0.6.2"
     cheerio "^1.0.0-rc.12"
